@@ -39,7 +39,7 @@ if [ -d "$dataset_path" ]; then
 mkdir -p $dataset_path
 wget -O $dataset_path/LJSpeech-1.1.tar.bz2 https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2 
 printf "Extracting dataset..\n"
-tar -xf $dataset_path/LJSpeech-1.1.tar.bz2 -C $dataset_path
+tar -xvf $dataset_path/LJSpeech-1.1.tar.bz2 -C $dataset_path
 printf "Dataset downloaded and extracted to $dataset_path\n"
 fi
 
