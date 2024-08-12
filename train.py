@@ -1,0 +1,86 @@
+# import torch
+import os
+import sys
+
+# Models & Configs
+from vendor.TTS.tts.configs.shared_configs import BaseDatasetConfig
+from vendor.TTS.tts.configs.vits_config import VitsConfig
+from vendor.TTS.tts.models.vits import Vits, VitsAudioConfig
+
+# Processors
+from vendor.TTS.utils.audio import AudioProcessor
+from vendor.TTS.tts.utils.text.tokenizer import TTSTokenizer
+
+# Training
+import vendor.TTS.tts.datasets as datasets
+
+# trainer is in a separated project on https://github.com/eginhard/coqui-trainer
+# this is installed in vendor with cd vendor; pip install -e .
+from trainer import Trainer, TrainerArgs 
+
+OUTPUT="output"
+os.makedirs(OUTPUT, exist_ok=True)
+
+outpath = os.path.join(OUTPUT, os.path.dirname(os.path.abspath(__file__)))
+
+if os.getenv("DATASET_PATH") is None:
+    print("Please set the DATASET_PATH environment variable.")
+    sys.exit(1)
+
+dataset_path = os.getenv("DATASET_PATH")
+
+dataset_config = BaseDatasetConfig(
+        formatter="ljspeech", meta_file_train="metadata.csv", path=dataset_path
+        )
+
+audio_config = VitsAudioConfig(
+        sample_rate=22050, win_length=1024, hop_length=256, num_mels=80, mel_fmin=0, mel_fmax=None
+        )
+
+vits_config = VitsConfig(
+    audio=audio_config,
+    run_name="vits_ljspeech",
+    batch_size=32,
+    eval_batch_size=16,
+    batch_group_size=5,
+    num_loader_workers=8,
+    num_eval_loader_workers=4,
+    run_eval=True,
+    test_delay_epochs=-1,
+    epochs=1000,
+    text_cleaner="english_cleaners",
+    use_phonemes=True,
+    phoneme_language="en-us",
+    phoneme_cache_path=os.path.join(outpath, "phoneme_cache"),
+    compute_input_seq_cache=True,
+    print_step=25,
+    print_eval=True,
+    mixed_precision=True,
+    output_path=outpath,
+    datasets=[dataset_config],
+    cudnn_benchmark=False,
+    )
+
+audio_processor = AudioProcessor.init_from_config(vits_config)
+tokenizer = TTSTokenizer.init_from_config(vits_config)
+
+train_samples, eval_samples = datasets.load_tts_samples(
+        dataset_config,
+        eval_split=True,
+        eval_split_max_size=vits_config.eval_split_max_size,
+        eval_split_size=vits_config.eval_split_size,
+)
+
+model = Vits(vits_config, audio_processor, tokenizer, speaker_manager=None)
+
+
+train = Trainer(
+        TrainerArgs(),
+        vits_config,
+        model=model,
+        train_samples=train_samples,
+        eval_samples=eval_samples,
+        output_path=outpath,
+        )
+
+train.fit();
