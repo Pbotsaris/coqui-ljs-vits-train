@@ -19,6 +19,10 @@ import vendor.TTS.tts.datasets as datasets
 from trainer import Trainer, TrainerArgs 
 
 OUTPUT="output"
+
+if not os.path.exists(OUTPUT):
+    print(f"Creating output directory: {OUTPUT}")
+
 os.makedirs(OUTPUT, exist_ok=True)
 
 outpath = os.path.join(OUTPUT, os.path.dirname(os.path.abspath(__file__)))
@@ -29,6 +33,7 @@ if os.getenv("DATASET_PATH") is None:
 
 dataset_path = os.getenv("DATASET_PATH")
 
+print("Setting up dataset: Using dataset path:", dataset_path)
 dataset_config = BaseDatasetConfig(
         formatter="ljspeech", meta_file_train="metadata.csv", path=dataset_path
         )
@@ -37,6 +42,7 @@ audio_config = VitsAudioConfig(
         sample_rate=22050, win_length=1024, hop_length=256, num_mels=80, mel_fmin=0, mel_fmax=None
         )
 
+print("Setting up Vits Config")
 vits_config = VitsConfig(
     audio=audio_config,
     run_name="vits_ljspeech",
@@ -61,8 +67,9 @@ vits_config = VitsConfig(
     cudnn_benchmark=False,
     )
 
+print("Setting up tokenizer and audio processor.")
 audio_processor = AudioProcessor.init_from_config(vits_config)
-tokenizer = TTSTokenizer.init_from_config(vits_config)
+tokenizer, vits_config = TTSTokenizer.init_from_config(vits_config)
 
 train_samples, eval_samples = datasets.load_tts_samples(
         dataset_config,
@@ -71,9 +78,11 @@ train_samples, eval_samples = datasets.load_tts_samples(
         eval_split_size=vits_config.eval_split_size,
 )
 
+print("Setting up model.")
 model = Vits(vits_config, audio_processor, tokenizer, speaker_manager=None)
 
 
+print("start training....")
 train = Trainer(
         TrainerArgs(),
         vits_config,
