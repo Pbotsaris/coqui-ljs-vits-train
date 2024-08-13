@@ -45,3 +45,6 @@ fi
 printf "Setting DATASET_PATH envirioment variable\n"
 export DATASET_PATH="$dataset_path"/LJSpeech-1.1
 
+
+printf "DONE! To activate the virtual environment run 'source venv/bin/activate'\n"
+

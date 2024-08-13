@@ -24,14 +24,15 @@ if not os.path.exists(OUTPUT):
     print(f"Creating output directory: {OUTPUT}")
 
 os.makedirs(OUTPUT, exist_ok=True)
+outpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), OUTPUT)
 
-outpath = os.path.join(OUTPUT, os.path.dirname(os.path.abspath(__file__)))
-
-if os.getenv("DATASET_PATH") is None:
-    print("Please set the DATASET_PATH environment variable.")
-    sys.exit(1)
+print(f'Checkpoints will be saved in {outpath}')
 
 dataset_path = os.getenv("DATASET_PATH")
+
+if  dataset_path is None:
+    print("Please set the DATASET_PATH environment variable.")
+    sys.exit(1)
 
 print("Setting up dataset: Using dataset path:", dataset_path)
 dataset_config = BaseDatasetConfig(
