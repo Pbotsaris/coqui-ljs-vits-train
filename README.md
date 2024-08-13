@@ -31,3 +31,8 @@ Investigate this
 
 > If you haven't tried deepfilternet for denoise, try poking around its command line application. Easy to use and works really well a lot of the time. Voicefixer is another, but it's a bit of a pain.
 
+
+### Explore in the future
+
+https://github.com/JarodMica/ai-voice-cloning
+
