@@ -5,6 +5,15 @@ if [ -z "$1" ]; then
    exit 1
 fi
 
+if [ -d 'venv' ]; then
+   printf "venv directory already exists. activating envirioment\n"
+   source venv/bin/activate
+ else
+   printf "Creating virtual environment\n"
+   python -m venv venv
+   source venv/bin/activate
+fi
+
 dataset_path=$1
 
 if [ -d 'vendor' ]; then
@@ -18,16 +27,6 @@ fi
 cd vendor
 
 # will make a venv here so the deps coqui deps don't conflict with whatever is pre-installed in gpu farm system
-
-if [ -d 'venv' ]; then
-   printf "venv directory already exists. activating envirioment\n"
-   source venv/bin/activate
- else
-   printf "Creating virtual environment\n"
-   python -m venv venv
-   source venv/bin/activate
-fi
-
 pip install -e .
 cd ..
 
@@ -42,7 +41,6 @@ printf "Extracting dataset..\n"
 tar -xvf $dataset_path/LJSpeech-1.1.tar.bz2 -C $dataset_path
 printf "Dataset downloaded and extracted to $dataset_path\n"
 fi
-
 
 printf "Setting DATASET_PATH envirioment variable\n"
 export DATASET_PATH="$dataset_path"/LJSpeech-1.1
