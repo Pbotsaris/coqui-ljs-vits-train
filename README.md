@@ -36,3 +36,12 @@ Investigate this
 
 https://github.com/JarodMica/ai-voice-cloning
 
+https://github.com/jasonppy/VoiceCraft?tab=readme-ov-file#environment-setup
+
+
+GPT-SoVITS
+Play HT 2.0
+
+OpenVoice V2
+XTTSv2
+

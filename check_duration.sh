@@ -5,6 +5,7 @@ if [ -z "S1" ]; then
    exit 1
 fi
 report=""
+total_dur=0
 
 for file in $1/*.wav; do
    dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$file")
@@ -15,10 +16,15 @@ for file in $1/*.wav; do
       printf "F"
    else
       printf "."
+      total_dur=$(echo "$total_dur + $dur" | bc)
    fi
 done
 
-echo "\n Report:"
-echo "$report"
+if [ ! -z "$report" ]; then
+   report="Not all files are at least 1 second long\n"
+   echo "\n Report:"
+   echo "$report"
+fi
 
+echo "Total Duration: $total_dur seconds"
 
