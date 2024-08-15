@@ -45,3 +45,17 @@ Play HT 2.0
 OpenVoice V2
 XTTSv2
 
+
+## Cleaning Lou's Dataset Log
+First we need to split the audio files so that they have no more than 10 seconds
+
+1. used the script `script/strip_silence.py` to strip silence from all the files using defaults
+2. then ran the `script/split_on_silence.py` again with the following settings
+
+         python split_on_silence.py --min-silence 110 --silence-thresh -60 --keep-silence 30 ~/storage/datasets/louspeech/test/
+3. The script writes the duration of the file in in milliseconds in the filename. Next step is to remove anything smaller than 1 second.
+
+
+## next exploration
+
+- maybe too strong discrimitator
